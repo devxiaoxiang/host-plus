@@ -28,7 +28,7 @@
 KV:  "test"  →  "<h1>hi</h1>"
 
 旧站   https://host.smallelephant.de5.net/s/test.html  → id  = "test" → kv.get("test")
-新站   https://test.xxhost.de5.net/                    → sub = "test" → kv.get("test")
+新站   https://xxx.xxhost.de5.net/                    → sub = "test" → kv.get("test")
 兼容   https://xxhost.de5.net/s/test.html              → id  = "test" → kv.get("test")
 ```
 
