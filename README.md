@@ -17,8 +17,7 @@
 ## 功能
 
 - 粘贴 HTML 一键部署，随机 10 位 ID 或自定义子域名（3–63 位，字母 / 数字 / `_` / `-`）
-- 主链接 `https://{id}.xxhost.de5.net`，兼容链接 `https://xxhost.de5.net/s/{id}.html`
-- 旧链接继续有效；旧站显示关闭页，`/s/` 保持只读
+- 链接 `https://{id}.xxhost.de5.net`
 - 全球 CDN 加速、免费、无广告、无追踪
 
 ## 原理
