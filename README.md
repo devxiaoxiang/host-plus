@@ -41,7 +41,7 @@ KV:  "test"  →  "<h1>hi</h1>"
 4. **Worker**：读 `CF-Connecting-Host`（回退 `Host`），去端口、转小写、去尾点，截取 `test` 作为 KV key。
 5. **响应**：返回 HTML，带 `Cache-Control: max-age=300`。
 
-为什么必须「通配 DNS + 两条 Route」：Custom Domain 不支持通配符，而 slug 是运行时生成的；`*.example.com/*` 又不匹配根域 `example.com`，所以根域要单独一条 Route。含点的子域会被拒绝，因为 Universal SSL 只覆盖一级子域。
+根域用 Custom Domain（`xxhost.de5.net`），Cloudflare 自动创建指向 Worker 的 CNAME 并签发证书，覆盖根域所有路径。子域用通配 DNS + Route，因为 Custom Domain 不支持通配符、slug 是运行时生成的。含点的子域会被拒绝，因为 Universal SSL 只覆盖一级子域。
 
 ## 配置过程
 
@@ -51,19 +51,18 @@ KV:  "test"  →  "<h1>hi</h1>"
 
 **3. 创建 Worker**：创建 Worker，在 `Settings → Bindings → KV Namespace` 添加绑定，变量名填 `host`，选择第 2 步的 namespace。把 `worker.js` 内容粘贴到 `Edit Code` 并 Deploy；也可用仓库自带的 `wrangler.jsonc` 直接 `wrangler deploy`（KV 绑定已配好）。
 
-**4. DNS 记录**（两条都要橙云 Proxied）：
+**4. DNS 记录**（手动只需一条，橙云 Proxied）：
 
 | 类型 | Name | 值 | 代理 |
 |---|---|---|---|
-| A | `@` | `192.0.2.1` | 橙云 |
 | A | `*` | `192.0.2.1` | 橙云 |
 
-> `*` 不匹配根域，所以 `@` 那条不能省；精确记录优先于通配记录，避免 slug 与已有 DNS 名冲突。
+> 根域 `xxhost.de5.net` **不要**手动加 `A @`：给 Worker 添加 Custom Domain 时 Cloudflare 会自动创建指向 Worker 的 CNAME 并签发证书；手加 A/CNAME 记录会与 Custom Domain 冲突。精确记录优先于通配记录，避免 slug 与已有 DNS 名冲突。
 
-**5. Worker Routes**（都指向 `xxhost`）：
+**5. Worker 域名绑定**（都指向 `xxhost`）：
 
-- `xxhost.de5.net/*`
-- `*.xxhost.de5.net/*`
+- Custom Domain：`xxhost.de5.net`（根域，Cloudflare 自动建 CNAME + 证书，覆盖全部路径）
+- Route：`*.xxhost.de5.net/*`（子域，配合上面的 `A *` 通配记录）
 
 **6. SSL/TLS**：加密模式 `Full (strict)`，开启 `Always Use HTTPS`。
 
